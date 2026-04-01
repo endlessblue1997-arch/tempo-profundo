@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Leitura Soberana — Programa de Práticas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  :root {
+    --warm: #3d2b1f;
+    --accent: #8B6914;
+    --muted: #6b5b4f;
+    --cream: #f5f0e8;
+    --dark: #1a1a1a;
+    --soft-line: #c4b5a0;
+    --light-green: #7a9e7e;
+    --medium-gold: #b8860b;
+    --intense-brown: #8b4513;
+    --rest-color: #c4b5a0;
+    --meditation-blue: #5b7e8c;
+  }
+  
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  .sans { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+  
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--warm) 0%, var(--dark) 100%);
+    padding: 20px 16px 16px;
+    color: var(--cream);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner { max-width: 540px; margin: 0 auto; }
+  .header-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .header-title { font-size: 18px; font-weight: 700; line-height: 1.3; margin-bottom: 2px; }
+  .header-subtitle { font-size: 12px; color: var(--soft-line); font-style: italic; }
+  
+  /* Progress */
+  .progress-row { display: flex; gap: 12px; margin-top: 12px; font-size: 10px; }
+  .progress-bar { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 6px; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
+  
+  /* Week tabs */
+  .week-tabs {
+    display: flex; gap: 4px; padding: 12px 16px 0;
+    max-width: 572px; margin: 0 auto;
+  }
+  .week-tab {
+    flex: 1; padding: 8px 4px; border: none; border-radius: 10px 10px 0 0;
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+    text-align: center;
+  }
+  .week-tab.active {
+    background: white; color: var(--warm); box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+  }
+  .week-tab:not(.active) {
+    background: rgba(0,0,0,0.03); color: var(--muted);
+  }
+  
+  /* Content area */
+  .content {
+    max-width: 540px; margin: 0 auto; padding: 0 16px;
+    background: white; min-height: 60vh;
+    border-radius: 0 0 16px 16px;
+    padding-bottom: 20px;
+  }
+  
+  /* Week theme */
+  .week-theme {
+    padding: 16px 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .week-theme h2 { font-size: 17px; color: var(--warm); margin-bottom: 4px; }
+  .week-theme p { font-size: 12px; color: var(--muted); font-style: italic; line-height: 1.5; }
+  
+  /* Day selector */
+  .day-selector {
+    display: flex; gap: 6px; padding: 14px 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .day-btn {
+    flex: 1; min-width: 40px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--soft-line);
+    background: white; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; transition: all 0.2s; position: relative;
+  }
+  .day-btn.active { border: 2px solid var(--accent); background: var(--warm); color: var(--cream); }
+  .day-btn.done:not(.active) { background: #f0ebe3; }
+  .day-num { font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; }
+  .day-dots { font-size: 7px; line-height: 1; }
+  .day-check {
+    position: absolute; top: -5px; right: -5px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--light-green);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .day-check svg { width: 8px; height: 8px; }
+  
+  /* Meditation card */
+  .meditation-card {
+    margin: 12px 4px; padding: 10px 14px;
+    background: rgba(91,126,140,0.06);
+    border: 1px solid rgba(91,126,140,0.15);
+    border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.2s;
+  }
+  .meditation-card:active { background: rgba(91,126,140,0.1); }
+  .meditation-left { display: flex; align-items: center; gap: 10px; }
+  .meditation-right { display: flex; align-items: center; gap: 8px; }
+  .meditation-title { font-size: 11px; font-weight: 600; color: var(--meditation-blue); }
+  .meditation-sub { font-size: 10px; color: var(--muted); font-style: italic; margin-top: 1px; }
+  .meditation-detail {
+    margin: -4px 4px 12px; padding: 14px;
+    background: rgba(91,126,140,0.04);
+    border: 1px solid rgba(91,126,140,0.1);
+    border-radius: 0 0 10px 10px;
+    font-size: 12px; color: var(--dark); line-height: 1.6;
+  }
+  
+  /* Check button */
+  .check-btn {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: 2px solid var(--soft-line); background: transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; color: white; flex-shrink: 0;
+  }
+  .check-btn.done { border: none; background: var(--light-green); }
+  .check-btn.med { border-color: var(--meditation-blue); }
+  .check-btn.med.done { background: var(--meditation-blue); }
+  .check-btn svg { width: 14px; height: 14px; }
+  
+  /* Main practice card */
+  .practice-card { padding: 16px 4px; }
+  .practice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .intensity-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .practice-day-title { font-size: 19px; color: var(--warm); font-weight: 700; margin-bottom: 6px; }
+  .reading-info { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .reading-info svg { width: 13px; height: 13px; flex-shrink: 0; }
+  
+  .practice-name { font-size: 15px; color: var(--warm); font-weight: 700; margin: 14px 0 2px; }
+  .practice-duration { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  
+  .step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+  .step-num {
+    min-width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; font-family: 'Inter', sans-serif;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-text { font-size: 13px; line-height: 1.6; }
+  
+  .practice-note {
+    margin-top: 14px; padding: 10px 14px;
+    border-left: 3px solid rgba(139,105,20,0.3);
+    border-radius: 0 8px 8px 0;
+    background: rgba(139,105,20,0.04);
+    font-size: 12px; color: var(--muted); font-style: italic; line-height: 1.5;
+  }
+  
+  /* Navigation */
+  .nav-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 4px 0;
+  }
+  .nav-btn {
+    padding: 10px 18px; border-radius: 10px;
+    font-size: 13px; font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .nav-prev { border: 1px solid var(--soft-line); background: white; color: var(--warm); }
+  .nav-next { border: none; background: var(--warm); color: var(--cream); }
+  .nav-btn:disabled { opacity: 0.4; cursor: default; }
+  
+  /* Footer */
+  .footer {
+    max-width: 540px; margin: 0 auto;
+    text-align: center; padding: 24px 32px 40px;
+  }
+  .footer-line { width: 40px; height: 1px; background: var(--accent); margin: 0 auto 16px; opacity: 0.4; }
+  .footer-quote { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.6; }
+  .footer-attr { font-size: 10px; color: var(--soft-line); margin-top: 6px; }
+  
+  /* Reset button */
+  .reset-row { text-align: center; padding: 12px 0 20px; }
+  .reset-btn {
+    font-size: 10px; color: var(--soft-line); background: none; border: none;
+    cursor: pointer; text-decoration: underline; font-family: 'Inter', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+// ─── DATA ───
+const weeks = [
+  {
+    num: 1, title: "A Ilusão do Controle",
+    subtitle: "Você acha que o problema é falta de tempo. Não é.",
+    chapters: "Introdução + Cap. 1–3",
+    meditation: { theme: "Relação com a finitude do tempo", duration: "5–10 min/dia" },
+    days: [
+      { day:1, title:"Onde vai o seu tempo?", reading:"Introdução: p. 9–16", intensity:"media",
+        practice:{ name:"Inventário do tempo real", duration:"15 min",
+          steps:["Duas colunas: \"Como acho que gastei ontem\" e \"Como realmente gastei.\"","Reconstrua o dia de ontem hora a hora. Inclua celular, pausas, buracos.","Compare. Onde está a maior diferença?","Guarde. Vamos repetir no Dia 29."],
+          note:"Não é para gerar culpa — é para gerar consciência."}},
+      { day:2, title:"A permissão de não dar conta", reading:"Introdução: p. 17–24", intensity:"leve",
+        practice:{ name:"Pergunta do dia", duration:"3 min",
+          steps:["\"Se eu nunca fosse dar conta de tudo, o que eu pararia de tentar fazer?\"","Escreva o que vier. 3 linhas.","Releia antes de dormir."]}},
+      { day:3, title:"Descanso", reading:"Cap. 1: p. 27–34", intensity:"descanso",
+        practice:{ name:"Dia de descanso", duration:"—",
+          steps:["Sem desafio. Leia, faça a meditação, fique com o silêncio.","O descanso é parte do treino."]}},
+      { day:4, title:"O mapa da fuga", reading:"Cap. 1: p. 35–42", intensity:"media",
+        practice:{ name:"Contagem das micro-fugas", duration:"Ao longo do dia",
+          steps:["Toda vez que pegar o celular sem motivo, registre um traço.","Não tente parar. Apenas conte.","No final do dia: de que eu estava fugindo?","Anote as 3 fugas mais frequentes."]}},
+      { day:5, title:"Entre uma coisa e outra", reading:"Cap. 1: p. 43–52", intensity:"leve",
+        practice:{ name:"Observação: o intervalo", duration:"Ao longo do dia",
+          steps:["Ao terminar uma tarefa, perceba o impulso de começar a próxima.","No intervalo, pare 5 segundos. Respire uma vez.","Quantas vezes conseguiu perceber o intervalo?"]}},
+      { day:6, title:"Riscar metade", reading:"Cap. 2: p. 53–60", intensity:"media",
+        practice:{ name:"A lista infinita", duration:"10 min",
+          steps:["Escreva tudo que \"deveria\" estar fazendo.","Olhe o peso. Agora risque metade.","Sinta o desconforto. Fique 1 minuto em silêncio.","O desconforto é a sensação de finitude."],
+          note:"Riscar não é negligência — é soberania."}},
+      { day:7, title:"O que eu descobri", reading:"Cap. 2: p. 61–68", intensity:"intensa",
+        practice:{ name:"Revisão semanal", duration:"20 min",
+          steps:["Releia anotações: inventário, micro-fugas, lista infinita.","Qual a descoberta mais desconfortável?","Algum momento de presença genuína?","Como foi a mesma meditação por 7 dias?","Escreva um parágrafo para o encontro ao vivo."]}}
+    ]
+  },
+  {
+    num: 2, title: "A Tirania da Eficiência",
+    subtitle: "Quanto mais você otimiza, menos vive.",
+    chapters: "Cap. 3–6",
+    meditation: { theme: "Habitar o tempo em vez de gerenciá-lo", duration: "5–10 min/dia" },
+    days: [
+      { day:8, title:"O que virou ferramenta?", reading:"Cap. 3–4: p. 69–86", intensity:"leve",
+        practice:{ name:"Pergunta do dia", duration:"3 min",
+          steps:["\"Qual atividade transformei em instrumento quando deveria ter valor por si?\"","Comer virou 'energia pro trabalho'? Exercício virou 'investimento'?","Nomeie pelo menos uma."]}},
+      { day:9, title:"A arte de esperar", reading:"Cap. 4: p. 87–94", intensity:"media",
+        practice:{ name:"Espera voluntária", duration:"3 momentos no dia",
+          steps:["Escolha a opção mais lenta em 3 situações.","Enquanto espera, não pegue o celular.","Observe a urgência interna. De onde vem?","Após cada espera: irritação? Ou algo inesperado?"],
+          note:"Esperar sem preencher é presença radical."}},
+      { day:10, title:"Descanso", reading:"Cap. 4: p. 95–102", intensity:"descanso",
+        practice:{ name:"Dia de descanso", duration:"—",
+          steps:["Sem desafio. Leia, medite, descanse."]}},
+      { day:11, title:"Unitarefa", reading:"Cap. 5: p. 103–110", intensity:"media",
+        practice:{ name:"Uma coisa por vez", duration:"Ao longo do dia",
+          steps:["Quando comer, apenas coma. Quando conversar, apenas converse.","Toda vez que dividir a atenção, pare. Escolha uma.","No final: como foi? O que ficou difícil?","A dificuldade é a mensagem."]}},
+      { day:12, title:"Prazer sem propósito", reading:"Cap. 5: p. 111–118", intensity:"leve",
+        practice:{ name:"O prazer que pede licença", duration:"Ao longo do dia",
+          steps:["Ao fazer algo prazeroso, observe: sua mente justifica?","'Bom pra desestressar', 'me dá energia'...","O prazer precisa de autorização pra existir?"]}},
+      { day:13, title:"Comer como se fosse a única coisa", reading:"Cap. 6: p. 119–128", intensity:"media",
+        practice:{ name:"Refeição sem pressa", duration:"30 min",
+          steps:["Uma refeição sem celular, sem TV, sem leitura.","Mastigue devagar. Sabor, textura, temperatura.","2 minutos sentado antes de levantar.","Observe a vontade de 'ir para a próxima coisa.'"]}},
+      { day:14, title:"Inutilidade sagrada", reading:"Cap. 6: p. 129–148", intensity:"intensa",
+        practice:{ name:"Revisão + Prazer inútil", duration:"30 min",
+          steps:["Prazer inútil (20 min): faça algo sem nenhuma utilidade. Caminhe sem destino, sente num banco. É inútil de propósito.","Revisão (10 min): releia anotações. Experimentei relação diferente com o tempo?","Escreva para o encontro ao vivo."]}}
+    ]
+  },
+  {
+    num: 3, title: "Distração como Fuga Existencial",
+    subtitle: "Você se distrai porque estar presente é desconfortável.",
+    chapters: "Cap. 7–10",
+    meditation: { theme: "Observar impulsos de fuga sem agir", duration: "5–10 min/dia" },
+    days: [
+      { day:15, title:"O nome da fuga", reading:"Cap. 7: p. 149–156", intensity:"leve",
+        practice:{ name:"Pergunta do dia", duration:"3 min",
+          steps:["\"Do que eu fugia a última vez que peguei o celular sem motivo?\"","Não aceite 'nada'. Tédio? Ansiedade? Solidão? Silêncio?","Nomeie em uma palavra."]}},
+      { day:16, title:"O tédio como portal", reading:"Cap. 7: p. 157–164", intensity:"media",
+        practice:{ name:"15 minutos de nada", duration:"15 min",
+          steps:["Sem celular, livro, música. Timer de 15 min.","Não medite. Não faça nada.","Primeiros 3 min: a urgência de fazer algo.","Entre 5 e 10: o desconforto muda?","Últimos 5: como é quando para de lutar?","Escreva: o que encontrei sem ter pra onde fugir?"],
+          note:"Se 15 min parecem demais, comece com 5. A resistência é a prática."}},
+      { day:17, title:"Descanso", reading:"Cap. 8: p. 165–172", intensity:"descanso",
+        practice:{ name:"Dia de descanso", duration:"—",
+          steps:["Sem desafio. Leia, medite, descanse."]}},
+      { day:18, title:"Radiografia da distração", reading:"Cap. 8: p. 173–180", intensity:"media",
+        practice:{ name:"Diário de fugas", duration:"Ao longo do dia",
+          steps:["Três colunas: Hora / O que fiz pra fugir / Do que fugia.","Registre toda vez que perceber impulso de distração.","A terceira coluna é a mais difícil e importante.","Não tente parar. Só mapeie."]}},
+      { day:19, title:"A presença na página", reading:"Cap. 9: p. 181–188", intensity:"leve",
+        practice:{ name:"Leitura como meditação", duration:"Durante a leitura",
+          steps:["Leia hoje em voz alta, devagar.","A cada parágrafo, pare. Olhos fechados 5 segundos.","O que o parágrafo gerou em você?","Ao final, uma frase: como foi ler assim?"]}},
+      { day:20, title:"O que o silêncio revela", reading:"Cap. 9: p. 189–196", intensity:"media",
+        practice:{ name:"Experimento do silêncio", duration:"2 horas",
+          steps:["2 horas em silêncio total. Sem fala, música, podcasts, mensagens.","Pode fazer atividades. Sem estímulo sonoro.","Quando o silêncio fica desconfortável?","Que pensamentos o silêncio traz?","Escreva o que descobriu."]}},
+      { day:21, title:"Nomeando o que você evita", reading:"Cap. 10: p. 197–210", intensity:"intensa",
+        practice:{ name:"Revisão + Evitação central", duration:"30 min",
+          steps:["Evitação (15 min): olhos fechados. \"O que estou evitando — não só hoje, mas neste momento da vida?\" Nomeie. Fique 10 min.","Revisão (15 min): releia diário de fugas, anotações do silêncio. O que encontrei quando parei de fugir?","Escreva para o encontro ao vivo."]}}
+    ]
+  },
+  {
+    num: 4, title: "Escolher e Renunciar",
+    subtitle: "Escolher é perder — e é a única forma de viver de verdade.",
+    chapters: "Cap. 11–14 + Epílogo",
+    meditation: { theme: "Presença pura — estar sem técnica", duration: "5–10 min/dia" },
+    days: [
+      { day:22, title:"O que importa de verdade", reading:"Cap. 11: p. 211–218", intensity:"media",
+        practice:{ name:"Bússola de valores", duration:"15 min",
+          steps:["4 quadrantes: Relacionamentos, Trabalho, Crescimento, Saúde.","\"O que realmente importa aqui? Não o que deveria.\"","2–3 valores por área. Avalie 0–10 alinhamento.","Onde está o maior gap?"],
+          note:"Valores não são metas. Metas se completam. Valores são direções."}},
+      { day:23, title:"500 semanas", reading:"Cap. 11: p. 219–226", intensity:"leve",
+        practice:{ name:"Pergunta do dia", duration:"3 min",
+          steps:["\"Se me restassem 500 semanas, o que eu pararia de fazer esta semana?\"","3 coisas concretas.","\"Por que não estou parando agora?\""]}},
+      { day:24, title:"Descanso", reading:"Cap. 12: p. 227–234", intensity:"descanso",
+        practice:{ name:"Dia de descanso", duration:"—",
+          steps:["Sem desafio. Leia, medite, descanse."]}},
+      { day:25, title:"O poder de desistir", reading:"Cap. 12–13: p. 235–250", intensity:"media",
+        practice:{ name:"A lista das renúncias", duration:"10 min",
+          steps:["\"Coisas que oficialmente desisto de fazer.\" Não adio — desisto.","Sinta o desconforto. A mente vai protestar.","Observe sem obedecer.","Cada renúncia libera atenção para o que importa."]}},
+      { day:26, title:"O menor passo", reading:"Cap. 13: p. 251–258", intensity:"leve",
+        practice:{ name:"Micro-compromisso", duration:"5 min + ação",
+          steps:["Bússola do Dia 22. Área com maior gap.","Uma ação minúscula, concreta, realizável hoje.","Tão pequena que não tenha desculpa. Faça.","A partir de hoje: um micro-compromisso por dia."]}},
+      { day:27, title:"Inércia ou decisão?", reading:"Cap. 14: p. 259–270", intensity:"media",
+        practice:{ name:"Presença como escolha", duration:"5x ao longo do dia",
+          steps:["5 vezes, pare 30s: \"Estou aqui por escolha ou inércia?\"","Se por escolha — continue com mais presença.","Se inércia — decida: continuo (por escolha) ou mudo?","Quantas vezes no automático?"]}},
+      { day:28, title:"Carta ao tempo", reading:"Cap. 14 + Epílogo: p. 271–296", intensity:"intensa",
+        practice:{ name:"Revisão final + Carta ao tempo", duration:"30 min",
+          steps:["Carta (15 min): escreva ao tempo como se fosse alguém. Como o tratou. O que descobriu. O que pretende. Guarde.","Revisão (15 min): releia TODAS as anotações do programa. O que mudou?","Escreva para o encontro final."]}},
+      { day:29, title:"Medindo a mudança", reading:"Releitura livre", intensity:"media",
+        practice:{ name:"Inventário final", duration:"15 min",
+          steps:["Repita o exercício do Dia 1. Reconstrua ontem hora a hora.","Compare com o primeiro inventário.","O que mudou? Não só distribuição — qualidade de presença.","Essa é a evidência do treino."]}},
+      { day:30, title:"O começo de tudo", reading:"Releitura da Introdução", intensity:"leve",
+        practice:{ name:"O Minuto Soberano", duration:"1 min — para o resto da vida",
+          steps:["Pare. Feche os olhos ou baixe o olhar.","Respire uma vez, devagar.","\"Estou presente? O que estou evitando? O que importa?\"","Abra os olhos. Continue com um grau a mais de consciência.","Um minuto. Todos os dias. Seu ato de soberania atencional."],
+          note:"Você terminou um livro inteiro. Não por disciplina — por presença."}}
+    ]
+  }
+];
+
+const intensityConfig = {
+  leve: { label:"● LEVE", color:"var(--light-green)", time:"5 min", bg:"rgba(122,158,126,0.08)" },
+  media: { label:"●● MÉDIA", color:"var(--medium-gold)", time:"10–15 min", bg:"rgba(184,134,11,0.08)" },
+  intensa: { label:"●●● INTENSA", color:"var(--intense-brown)", time:"15–30 min", bg:"rgba(139,69,19,0.08)" },
+  descanso: { label:"○ DESCANSO", color:"var(--rest-color)", time:"", bg:"rgba(196,181,160,0.08)" },
+};
+
+const quotes = [
+  { text: "A duração média da vida humana é absurdamente, terrivelmente, insultuosamente curta.", attr: "Burkeman" },
+  { text: "A produtividade é uma armadilha.", attr: "Burkeman" },
+  { text: "A pressa é universal porque todo mundo está fugindo de si mesmo.", attr: "Nietzsche" },
+  { text: "Atenção é o começo da devoção.", attr: "Mary Oliver" },
+];
+
+// ─── STORAGE ───
+const STORAGE_KEY = "leitura_soberana_v1";
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveState(state) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+}
+
+// ─── APP ───
+function App() {
+  const [weekIdx, setWeekIdx] = useState(0);
+  const [dayIdx, setDayIdx] = useState(0);
+  const [showMed, setShowMed] = useState(false);
+  const [state, setState] = useState(loadState);
+
+  useEffect(() => { saveState(state); }, [state]);
+
+  const week = weeks[weekIdx];
+  const current = week.days[dayIdx];
+  const cfg = intensityConfig[current.intensity];
+  const quote = quotes[weekIdx];
+
+  const toggleChallenge = (day) => {
+    setState(prev => ({ ...prev, [`c${day}`]: !prev[`c${day}`] }));
+  };
+  const toggleMeditation = (day) => {
+    setState(prev => ({ ...prev, [`m${day}`]: !prev[`m${day}`] }));
+  };
+
+  const totalDays = weeks.reduce((sum, w) => sum + w.days.length, 0);
+  const challengesDone = Object.keys(state).filter(k => k.startsWith('c') && state[k]).length;
+  const meditationsDone = Object.keys(state).filter(k => k.startsWith('m') && state[k]).length;
+
+  const resetAll = () => {
+    if (confirm("Tem certeza? Isso apaga todo o progresso.")) {
+      setState({});
+    }
+  };
+
+  const goNext = () => {
+    if (dayIdx < week.days.length - 1) {
+      setDayIdx(dayIdx + 1);
+    } else if (weekIdx < weeks.length - 1) {
+      setWeekIdx(weekIdx + 1);
+      setDayIdx(0);
+    }
+    setShowMed(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goPrev = () => {
+    if (dayIdx > 0) {
+      setDayIdx(dayIdx - 1);
+    } else if (weekIdx > 0) {
+      setWeekIdx(weekIdx - 1);
+      setDayIdx(weeks[weekIdx - 1].days.length - 1);
+    }
+    setShowMed(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const isFirst = weekIdx === 0 && dayIdx === 0;
+  const isLast = weekIdx === weeks.length - 1 && dayIdx === week.days.length - 1;
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="header">
+        <div className="header-inner">
+          <p className="header-label sans">Leitura Soberana</p>
+          <h1 className="header-title">Quatro Mil Semanas</h1>
+          <div className="progress-row sans">
+            <span style={{color:"var(--accent)"}}>Desafios: {challengesDone}/{totalDays}</span>
+            <span style={{color:"var(--meditation-blue)"}}>Meditações: {meditationsDone}/{totalDays}</span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{width:`${(challengesDone/totalDays)*100}%`}} />
+          </div>
+        </div>
+      </div>
+
+      {/* Week tabs */}
+      <div className="week-tabs sans">
+        {weeks.map((w, i) => (
+          <button key={i} className={`week-tab ${i===weekIdx?'active':''}`}
+            onClick={() => { setWeekIdx(i); setDayIdx(0); setShowMed(false); }}>
+            SEM {w.num}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="content">
+        {/* Week theme */}
+        <div className="week-theme">
+          <h2>{week.title}</h2>
+          <p>{week.subtitle}</p>
+        </div>
+
+        {/* Day selector */}
+        <div className="day-selector">
+          {week.days.map((d, i) => {
+            const isActive = i === dayIdx;
+            const isDone = state[`c${d.day}`];
+            const dcfg = intensityConfig[d.intensity];
+            return (
+              <button key={d.day} className={`day-btn ${isActive?'active':''} ${isDone?'done':''}`}
+                onClick={() => { setDayIdx(i); setShowMed(false); }}>
+                <span className="day-num sans" style={isActive?{color:'var(--cream)'}:{}}>{d.day}</span>
+                <span className="day-dots" style={{color: isActive?'var(--accent)':dcfg.color}}>
+                  {d.intensity==='descanso'?'○':d.intensity==='leve'?'●':d.intensity==='media'?'●●':'●●●'}
+                </span>
+                {isDone && <div className="day-check">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
+                </div>}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Meditation */}
+        <div className="meditation-card" onClick={() => setShowMed(!showMed)}>
+          <div className="meditation-left">
+            <span style={{fontSize:18}}>🧘</span>
+            <div>
+              <p className="meditation-title sans">Meditação diária — {week.meditation.duration}</p>
+              <p className="meditation-sub">{week.meditation.theme}</p>
+            </div>
+          </div>
+          <div className="meditation-right">
+            <button className={`check-btn med ${state[`m${current.day}`]?'done':''}`}
+              onClick={(e) => { e.stopPropagation(); toggleMeditation(current.day); }}>
+              {state[`m${current.day}`] && <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>}
+            </button>
+            <span style={{color:'var(--muted)', transform:showMed?'rotate(90deg)':'rotate(0)', transition:'transform 0.2s', display:'inline-block'}}>›</span>
+          </div>
+        </div>
+        {showMed && (
+          <div className="meditation-detail">
+            <p style={{marginBottom:8}}>A mesma prática todos os dias da semana. No dia 1 é estranho. No dia 4 solta. No dia 7 é outra coisa.</p>
+            <p style={{fontStyle:'italic', color:'var(--muted)', fontSize:11}}>A meditação será conduzida por mim nos encontros e disponibilizada em áudio.</p>
+          </div>
+        )}
+
+        {/* Practice */}
+        <div className="practice-card">
+          <div className="practice-header">
+            <div>
+              <p className="intensity-tag sans" style={{color:cfg.color}}>
+                DIA {current.day} — {cfg.label} {cfg.time && `(${cfg.time})`}
+              </p>
+              <h2 className="practice-day-title">{current.title}</h2>
+              <div className="reading-info sans">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="1.5"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" strokeWidth="1.5"/></svg>
+                {current.reading}
+              </div>
+            </div>
+            <button className={`check-btn ${state[`c${current.day}`]?'done':''}`}
+              onClick={() => toggleChallenge(current.day)}
+              style={{width:36,height:36,borderRadius:10}}>
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke={state[`c${current.day}`]?'white':'var(--soft-line)'} strokeWidth="2" strokeLinecap="round"/></svg>
+            </button>
+          </div>
+
+          <h3 className="practice-name">{current.practice.name}</h3>
+          {current.practice.duration !== "—" && (
+            <p className="practice-duration sans">{current.practice.duration}</p>
+          )}
+
+          <div>
+            {current.practice.steps.map((step, i) => (
+              <div key={i} className="step">
+                <span className="step-num" style={{background:cfg.bg, color:cfg.color}}>{i+1}</span>
+                <p className="step-text">{step}</p>
+              </div>
+            ))}
+          </div>
+
+          {current.practice.note && (
+            <div className="practice-note">{current.practice.note}</div>
+          )}
+        </div>
+
+        {/* Nav */}
+        <div className="nav-row">
+          <button className="nav-btn nav-prev sans" onClick={goPrev} disabled={isFirst}>← Anterior</button>
+          <button className="nav-btn nav-next sans" onClick={goNext} disabled={isLast}>Próximo →</button>
+        </div>
+
+        {/* Reset */}
+        <div className="reset-row">
+          <button className="reset-btn" onClick={resetAll}>Resetar progresso</button>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="footer">
+        <div className="footer-line" />
+        <p className="footer-quote">{quote.text}</p>
+        <p className="footer-attr">— {quote.attr}</p>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('app'));
+</script>
+</body>
+</html>
